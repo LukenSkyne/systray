@@ -71,6 +71,9 @@ var (
 
 	// ErrTrayNotReadyYet is returned by functions when they are called before the tray has been initialized.
 	ErrTrayNotReadyYet = errors.New("tray not ready yet")
+
+	// Channel for listening to the menu opening event
+	OnMenuOpenCh = make(chan struct{}, 1)
 )
 
 // Contains window class information.
@@ -329,6 +332,7 @@ func (t *winTray) wndProc(hWnd windows.Handle, message uint32, wParam, lParam ui
 	case t.wmSystrayMessage:
 		switch lParam {
 		case WM_RBUTTONUP, WM_LBUTTONUP:
+			OnMenuOpenCh <- struct{}{}
 			t.showMenu()
 		}
 	case t.wmTaskbarCreated: // on explorer.exe restarts
